@@ -12,4 +12,4 @@ It also notifies you about the updates.
 
 You can also find the information of a hunter.
 
-![](/images/info.png)
+![](/images/infos.png)
