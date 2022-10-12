@@ -9,7 +9,7 @@ pip install requirements.txt
 
 python3 YesWeBot.py
 ```
-## Informations
+## Informations
 Yes we bot keep you informed of the activity of your reports and those of your mates.
 
 ![](/images/new.png)
