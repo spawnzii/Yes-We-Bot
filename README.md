@@ -1,6 +1,6 @@
 # Yes-We-Bot
 
-## Install
+## Installation
 
 ```bash=
 git clone https://github.com/spawnzii/Yes-We-Bot.git
@@ -9,7 +9,7 @@ pip install requirements.txt
 
 python3 YesWeBot.py
 ```
-
+## Informations
 Yes we bot keep you informed of the activity of your reports and those of your mates.
 
 ![](/images/new.png)
