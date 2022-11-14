@@ -1,88 +1,64 @@
-#!/usr/bin/python3
-
-import hashlib
-from asyncio import tasks
+from functions.get_infos import *
 import discord
 from discord.ext import commands
 from discord.ext import tasks
-import requests
+import mysql.connector
 from datetime import date
 import secrets
-import os
+
 
 bot = commands.Bot(command_prefix="!",description="Yes We Hack")
 
-def get_last_feed():
-    url = "https://api.yeswehack.com/hacktivity"
-    r = requests.get(url)
-    feed = r.text
-    return feed
-
-def get_hashed_feed(feed):
-    hashed_feed = hashlib.sha256(feed.encode('utf-8')).hexdigest()
-    return hashed_feed
-
-def user_infos(user):
-    url = f"https://api.yeswehack.com/hunters/{user}"
-    r = requests.get(url)
-    if r.status_code != 404:
-        return r.text
-    else:
-        return False
-
-os.environ["YWHash"] = "empty"
-
 @tasks.loop(minutes=1)
 async def check_feed():
-    last_feed = get_last_feed()
-
-    if os.environ['YWHash'] != get_hashed_feed(last_feed):
-        os.environ['YWHash'] = get_hashed_feed(last_feed)
+    icons_bug = ["🐞","🪰","🪲","🪳","🕷","🐜"]
+    hunters = ["laluka","spawnzii","w0rty","perce","sicarius","geluchat","itarow","w00dy","yo0x-1","mizu"]
+    for hunter in hunters:
+        new = checksum_feed(get_user_feed(hunter))
+        old = db_get_old_hash(hunter)
+        feed = get_user_feed(hunter)
+        bug = feed[0]["report"]["bug_type"]["name"]
+        pseudo = feed[0]["report"]["hunter"]["username"]
+        status = feed[0]["status"]["workflow_state"]
+        pp = get_pp_user(hunter)
         
-        hunters = ["spawnzii","w0rty","perce","sicarius","_yo0x","itarow","w00dy"] # use lowercase usernames
-        last_feed = last_feed.rsplit('"')
-        bug = last_feed[last_feed.index("bug_type")+4]
-        user = last_feed[last_feed.index("username")+2]
-        status = last_feed[last_feed.index("status")+4]
-        avatar_url = last_feed[last_feed.index("url")+2]
-        icons_bug = ["🐞","🪰","🪲","🪳","🕷","🐜"]
-
-        if "default_image" in avatar_url:
-            avatar_url = "https://cdn-yeswehack.com/business-unit/logo/699717c7ac0d05bbccf13972496abc02"
-
-        if user.lower() in hunters and status.lower() == "new":
+        if new != old and status == "new":
             today = date.today()
             icons = secrets.choice(icons_bug)
             embed = discord.Embed(color=discord.Color.red())
             embed.set_author(
-            name=f"{user} has found a new bug {icons}", url=avatar_url, icon_url=avatar_url)
+            name=f"{hunter} has found a new bug {icons}", url=pp, icon_url=pp)
             embed.add_field(name="**Bug Type**", value=bug, inline=True)
             embed.add_field(name="**Status**", value=status, inline=True)
             embed.add_field(name="**Date**", value=today, inline=False)
             discord_server = bot.get_channel(831949020804939837)       # Your channel id
             await discord_server.send(embed=embed)
-
-        if user.lower() in hunters and status.lower() == "accepted":
-    
+            db_update_hash(hunter, new)
+        
+        if new != old and status == "accepted":
             today = date.today()
+            icons = secrets.choice(icons_bug)
             embed = discord.Embed(color=discord.Color.green())
             embed.set_author(
-            name=f"Congrats ! {user}'s report was {status} 🔥", url=avatar_url, icon_url=avatar_url)
+            name=f"Congrats ! {hunter}'s report was {status} 🔥", url=pp, icon_url=pp)
             embed.add_field(name="**Bug Type** :", value=bug, inline=True)
             embed.add_field(name="**Date ** :", value=today, inline=True)
             discord_server = bot.get_channel(831949020804939837)       # Your channel id
             await discord_server.send(embed=embed)
-
-        if user.lower() in hunters and status.lower() == "resolved":
-
+            db_update_hash(hunter, new)
+        
+        if new != old and status == "resolved":
+            today = date.today()
+            icons = secrets.choice(icons_bug)
             today = date.today()
             embed = discord.Embed(color=discord.Color.dark_grey())
             embed.set_author(
-            name=f"No more bugs! {user}'s report was {status} 🦾", url=avatar_url, icon_url=avatar_url)
+            name=f"No more bugs! {hunter}'s report was {status} 🦾", url=pp, icon_url=pp)
             embed.add_field(name="** Bug Type ** :", value=bug, inline=True)
             embed.add_field(name="** Date ** :", value=today, inline=True)
             discord_server = bot.get_channel(831949020804939837)       # Your channel id
             await discord_server.send(embed=embed)
+            db_update_hash(hunter, new)
 
 
 @bot.event
@@ -92,33 +68,32 @@ async def on_ready():
 
 @bot.command()
 async def infos(ctx,user):
-    if user_infos(user) is False:
-        await ctx.send(f"User **{user}** not found or his profile is in private")
+    if get_user_infos(user) is False:
+        await ctx.send(f"User **{user}** not found or his profile is private")
     else:
-        infos = user_infos(user).rsplit('"')
-        rank = infos[infos.index('rank') + 1]
-        rank = rank.replace(",","").replace(":","")
-        point = infos[infos.index('points') + 1]
-        point = point.replace(",","").replace(":","")
-        report = infos[infos.index('nb_reports') + 1]
-        report = report.replace(",","").replace(":","")
-        impact = infos[infos.index('impact') + 2]
-        avatar_url = infos[infos.index('url') + 2]
+        feed = get_user_feed(user.lower())
+        bug = feed[0]["report"]["bug_type"]["name"]
+        infos = get_user_infos(user.lower())
+        rank = infos["rank"]
+        point = infos["points"]
+        report = infos["nb_reports"]
+        impact = infos["impact"]
+        pp = infos["avatar"]["url"]
 
         if impact == "kyc_status":
             impact = "None"
 
-        if "default_image" in avatar_url:
-            avatar_url = "https://cdn-yeswehack.com/business-unit/logo/699717c7ac0d05bbccf13972496abc02"
+        if "default_image" in pp:
+            pp = "https://cdn-yeswehack.com/business-unit/logo/699717c7ac0d05bbccf13972496abc02"
 
         embed = discord.Embed(color=discord.Color.blue())
         embed.set_author(
-        name=f"Profile of {user}", url=avatar_url, icon_url=avatar_url)
+        name=f"Profile of {user}", url=pp, icon_url=pp)
         embed.add_field(name="Rank 🏆", value=rank, inline=True)
         embed.add_field(name="Points 🏅", value=point, inline=True)
         embed.add_field(name="Reports 🚩", value=report, inline=True)
         embed.add_field(name="Impact 💀", value=impact, inline=True)
+        embed.add_field(name="Last finding 🪲", value=bug, inline=False)
         await ctx.send(embed=embed)
-
-
-bot.run("") # add your token.
+        
+bot.run("") # Your token
