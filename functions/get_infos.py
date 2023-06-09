@@ -87,7 +87,7 @@ def add_user_to_db(username):
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
     fake_hash = "feedhash"
-    if username not in get_user_db():
+    if username.lower() not in get_user_db():
         r = requests.get(f'https://api.yeswehack.com/hunters/{username}')
         if r.status_code != 404:
             sql = "INSERT INTO hunters(name,hash) VALUES (%s, %s)"
