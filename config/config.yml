@@ -1,0 +1,12 @@
+discord:
+  token: # discord bot token
+  channel: # discord channel id
+  admins:
+    - XXXXXXX #id of admin1
+    - XXXXXXX #id of admin2
+
+mysql:
+  user: # mysql_user
+  password: #mysql_password
+  host: ywh-db
+  database: # mysql_database

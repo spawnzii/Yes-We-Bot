@@ -1,0 +1,36 @@
+services:
+  ywh-spawnzii:
+    container_name: ywh-spawnzii
+    build:
+      context: .
+    image: spawnzii/ywh:latest
+    restart: always
+    volumes:
+      - ./config/config.yml:/app/config/config.yml
+    networks:
+      - ywh_backend
+    depends_on:
+      - ywh-db
+  ywh-db:
+    container_name: ywh-db
+    restart: always
+    image: mysql:latest
+    command: --skip-initialize-insecure
+    environment:
+      - MYSQL_ROOT_PASSWORD=spawnzii
+      - MYSQL_USER=spawnzii
+      - MYSQL_PASSWORD=spawnzii
+      - MYSQL_DATABASE=ywh
+      - MYSQL_MAX_CONNECTIONS=100
+      - MYSQL_MAX_ALLOWED_PACKET=256M
+      - MYSQL_NET_BUFFER_LENGTH=16K
+      - MYSQL_WAIT_TIMEOUT=28800
+    volumes:
+      - ./config/my.cnf:/etc/mysql/my.cnf
+      - ./data:/var/lib/mysql
+    networks:
+      - ywh_backend
+
+networks:
+  ywh_backend:
+    external: true
