@@ -5,10 +5,10 @@
 ```bash=
 git clone https://github.com/spawnzii/Yes-We-Bot.git
 cd Yes-We-Bot/
-pip install requirements.txt
-
-python3 YesWeBot.py
+# Complete and modify the config/config.yml
+docker compose up -d --build
 ```
+
 ## Informations
 Yes we bot keep you informed of the activity of your reports and those of your mates.
 
