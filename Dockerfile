@@ -8,4 +8,4 @@ RUN mkdir config
 
 RUN pip3 install -U pip pyopenssl && pip3 install -U -r requirements.txt
 
-ENTRYPOINT [ "python3","-u","maim.py" ]
+ENTRYPOINT [ "python3","-u","main.py" ]
