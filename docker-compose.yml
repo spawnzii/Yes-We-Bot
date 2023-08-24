@@ -7,6 +7,7 @@ services:
     restart: always
     volumes:
       - ./config/config.yml:/app/config/config.yml
+      - ./app:/app
     networks:
       - ywh_backend
     depends_on:
@@ -27,10 +28,14 @@ services:
       - MYSQL_WAIT_TIMEOUT=28800
     volumes:
       - ./config/my.cnf:/etc/mysql/my.cnf
-      - ./data:/var/lib/mysql
+      - data:/var/lib/mysql
     networks:
       - ywh_backend
 
 networks:
   ywh_backend:
+    external: true
+
+volumes:
+  data:
     external: true
