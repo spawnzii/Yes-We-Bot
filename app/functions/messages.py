@@ -87,7 +87,10 @@ def send_bugs(db: Database):
         old_hashes = [future.result() for future in old_hash_futures]
 
         for feed, checksum, old_hash, pp in zip(feeds, checksums, old_hashes, all_pp):
-            bug = feed[0]["report"]["bug_type"]["name"]
+            try:
+                bug = feed[0]["report"]["bug_type"]["name"]
+            except IndexError:
+                continue
             pseudo = feed[0]["report"]["hunter"]["slug"]
             status = feed[0]["status"]["workflow_state"]
 
