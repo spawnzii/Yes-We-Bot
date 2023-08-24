@@ -1,5 +1,5 @@
 import mysql.connector
-
+import requests
 class Database():
     def __init__(self, host, user, password, database) -> None:
         self.db_parameters = {
