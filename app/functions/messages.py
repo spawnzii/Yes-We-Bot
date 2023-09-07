@@ -14,7 +14,11 @@ def user_infos(user):
         embed.add_field(
             name="Error", value=f"User **{user}** not found or his profile is private")
     else:
-        feed = ywh.get_user_feed(user)
+        try:
+            feed = ywh.get_user_feed(user)
+        except:
+            return
+        
         bug = feed[0]["report"]["bug_type"]["name"]
         infos = ywh.get_user_infos(user)
         rank = infos["rank"]

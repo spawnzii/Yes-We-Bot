@@ -9,7 +9,11 @@ class YesWeHack:
     def get_user_feed(self, username):
         r = requests.get(
             f"https://api.yeswehack.com/hacktivity/{username}?page=1&resultsPerPage=500")
-        feed = r.json()["items"]
+
+        try:
+            feed = r.json()["items"]
+        except:
+            fee = None
         return feed
 
     def get_pp_user(self, username):

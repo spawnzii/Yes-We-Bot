@@ -68,7 +68,10 @@ async def infos(ctx, user):
     db = Database(db_host, db_user, db_password, db_database)
     user = user.lower()
     embed = user_infos(user)
-    await ctx.send(embed=embed)
+    try:
+        await ctx.send(embed=embed)
+    except:
+        return
 
 @bot.command()
 async def add(ctx, user):
