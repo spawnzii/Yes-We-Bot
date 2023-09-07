@@ -26,16 +26,18 @@ def user_infos(user):
         report = infos["nb_reports"]
         impact = infos["impact"]
         pp = infos["avatar"]["url"]
+        url = f"https://yeswehack.com/hunters/{user}"
 
         if impact == "kyc_status":
             impact = "None"
 
         if "default_image" in pp:
             pp = "https://cdn-yeswehack.com/business-unit/logo/699717c7ac0d05bbccf13972496abc02"
+        
 
         embed = Embed(color=Color.blue())
         embed.set_author(
-            name=f"Profile of {user}", url=pp, icon_url=pp)
+            name=f"Profile of {user}", url=url, icon_url=pp)
         embed.add_field(name="Rank 🏆", value=rank, inline=True)
         embed.add_field(name="Points 🏅", value=point, inline=True)
         embed.add_field(name="Reports 🚩", value=report, inline=True)
@@ -97,13 +99,14 @@ def send_bugs(db: Database):
                 continue
             pseudo = feed[0]["report"]["hunter"]["slug"]
             status = feed[0]["status"]["workflow_state"]
+            url = f"https://yeswehack.com/hunters/{pseudo}"
 
             if checksum != old_hash and status == "new":
                 today = date.today()
                 icons = secrets.choice(icons_bug)
                 embed = Embed(color=Color.red())
                 embed.set_author(
-                    name=f"{pseudo} has found a new bug {icons}", url=pp, icon_url=pp)
+                    name=f"{pseudo} has found a new bug {icons}", url=url, icon_url=pp)
                 embed.add_field(name="**Bug Type**", value=bug, inline=True)
                 embed.add_field(name="**Status**", value=status, inline=True)
                 embed.add_field(name="**Date**", value=today, inline=False)
@@ -115,7 +118,7 @@ def send_bugs(db: Database):
                 icons = secrets.choice(icons_bug)
                 embed = Embed(color=Color.green())
                 embed.set_author(
-                    name=f"Congrats ! {pseudo}'s report was {status} 🔥", url=pp, icon_url=pp)
+                    name=f"Congrats ! {pseudo}'s report was {status} 🔥", url=url, icon_url=pp)
                 embed.add_field(name="**Bug Type** :", value=bug, inline=True)
                 embed.add_field(name="**Date ** :", value=today, inline=True)
                 db.update_hash(pseudo, checksum)
@@ -127,7 +130,7 @@ def send_bugs(db: Database):
                 today = date.today()
                 embed = Embed(color=Color.dark_grey())
                 embed.set_author(
-                    name=f"No more bugs! {pseudo}'s report was {status} 🦾", url=pp, icon_url=pp)
+                    name=f"No more bugs! {pseudo}'s report was {status} 🦾", url=url, icon_url=pp)
                 embed.add_field(name="** Bug Type ** :",
                                 value=bug, inline=True)
                 embed.add_field(name="** Date ** :", value=today, inline=True)
