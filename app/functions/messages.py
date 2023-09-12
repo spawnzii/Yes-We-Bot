@@ -16,10 +16,10 @@ def user_infos(user):
     else:
         try:
             feed = ywh.get_user_feed(user)
+            bug = feed[0]["report"]["bug_type"]["name"]
         except:
             return
         
-        bug = feed[0]["report"]["bug_type"]["name"]
         infos = ywh.get_user_infos(user)
         rank = infos["rank"]
         point = infos["points"]
