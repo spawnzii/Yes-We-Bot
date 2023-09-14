@@ -19,7 +19,10 @@ class YesWeHack:
     def get_pp_user(self, username):
         r = requests.get(f'https://api.yeswehack.com/hunters/{username}')
         infos = r.json()
-        pp = infos["avatar"]["url"]
+        try:
+            pp = infos["avatar"]["url"]
+        except:
+            pp = "https://cdn-yeswehack.com/business-unit/logo/699717c7ac0d05bbccf13972496abc02"
         return pp
 
     def get_user_infos(self, username):
