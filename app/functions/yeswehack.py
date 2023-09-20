@@ -13,7 +13,7 @@ class YesWeHack:
         try:
             feed = r.json()["items"]
         except:
-            fee = None
+            feed = None
         return feed
 
     def get_pp_user(self, username):
